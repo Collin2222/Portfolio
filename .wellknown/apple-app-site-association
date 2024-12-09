@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "Collin_Hammock.com.collinhammock.Eventure",
+        "paths": ["/callback"]
+      }
+    ]
+  }
+}
