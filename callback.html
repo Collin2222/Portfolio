@@ -3,22 +3,49 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
-    <script>
-        // Get the URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        
-        if (code) {
-            // Redirect to your app using the custom URL scheme with the authorization code
-            window.location.href = `myapp://callback?code=${code}`;
-        } else {
-            // Handle any error case, if necessary
-            alert("Error: No code in the callback URL.");
-        }
-    </script>
+    <title>OAuth Callback</title>
 </head>
 <body>
-    <p>Redirecting...</p>
+    <h1>Callback Received</h1>
+    <p id="status">Waiting for OAuth callback...</p>
+
+    <script>
+        // Get the query parameters from the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const code = urlParams.get('code');
+
+        if (code) {
+            // Make a POST request to exchange the code for an access token
+            const tokenUrl = 'https://www.eventbrite.com/oauth/token';
+            const clientId = 'ELA4UXPYGSE6BKCZSB'; // Your client ID
+            const clientSecret = 'SWU5ENKJHBZC6TGRW22NMZEG55UDINBGGS44ECQCK3LNMKAVRD'; // Your client secret
+            const redirectURI = 'https://www.collinhammock.com/callback'; // Your redirect URI
+
+            const data = new URLSearchParams({
+                'grant_type': 'authorization_code',
+                'client_id': clientId,
+                'client_secret': clientSecret,
+                'code': code,
+                'redirect_uri': redirectURI
+            });
+
+            fetch(tokenUrl, {
+                method: 'POST',
+                body: data
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Store the access token in localStorage or process it as needed
+                localStorage.setItem('eventbriteAccessToken', data.access_token);
+                document.getElementById('status').textContent = 'OAuth successful! Access token stored.';
+            })
+            .catch(error => {
+                console.error('Error fetching token:', error);
+                document.getElementById('status').textContent = 'OAuth failed.';
+            });
+        } else {
+            document.getElementById('status').textContent = 'Authorization code not found.';
+        }
+    </script>
 </body>
 </html>
